@@ -16,7 +16,7 @@ def lambda_handler(event, context):
      print("Invoking command: " + str(command))
       
      # invoke command
-     ssmresponse = ssm.send_command(InstanceIds=['XXXXXXXX'], DocumentName='AWS-RunShellScript', Parameters= { 'commands': [command] } )
+     ssmresponse = ssm.send_command(InstanceIds=['XXXXXXXXXX'], DocumentName='AWS-RunShellScript', Parameters= { 'commands': [command] } )
      print("Command: " + command + ", response: " + str(ssmresponse))
       
      # delete
