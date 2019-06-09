@@ -1,0 +1,24 @@
+import json
+import urllib
+ 
+import boto3
+ 
+s3 = boto3.resource('s3')
+ssm = boto3.client('ssm')
+ 
+def lambda_handler(event, context):
+     src_bucket_name = event['Records'][0]['s3']['bucket']['name']
+     src_key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
+     src_key_version = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['versionId'], encoding='utf-8')
+     print("Received file: " + str(src_key))
+      
+     command = "sudo -H -u centos /home/centos/copy_s3.sh {}".format(src_key)
+     print("Invoking command: " + str(command))
+      
+     # invoke command
+     ssmresponse = ssm.send_command(InstanceIds=['XXXXXXXX'], DocumentName='AWS-RunShellScript', Parameters= { 'commands': [command] } )
+     print("Command: " + command + ", response: " + str(ssmresponse))
+      
+     # delete
+     response = s3.meta.client.delete_object(Bucket=src_bucket_name, Key=src_key,VersionId=src_key_version)
+     print("Deleted file: " + str(src_key) + ", response: " + str(response))
